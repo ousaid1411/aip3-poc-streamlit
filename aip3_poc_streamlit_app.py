@@ -36,7 +36,7 @@ if st.button("Generate Draft"):
     try:
         # Call OpenAI API
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You're a Singapore government procurement officer drafting IT specifications."},
                 {"role": "user", "content": prompt}
