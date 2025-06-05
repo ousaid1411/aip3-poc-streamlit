@@ -1,12 +1,14 @@
 
 import streamlit as st
-import openai
-import json
+from openai import OpenAI
+import os
 
-# Set your OpenAI API key here
-openai.api_key = "YOUR_OPENAI_API_KEY"
+# Load API key from Streamlit secrets (or fallback to environment variable)
+api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY")
 
-# Load reference clauses (mock)
+client = OpenAI(api_key=api_key)
+
+# Reference mock data
 reference_data = {
     "CRM System": [
         "The system shall support multi-channel communication (email, SMS, chat).",
@@ -18,7 +20,7 @@ reference_data = {
     ]
 }
 
-# Load compliance requirements (mock)
+# Compliance checklist
 compliance_requirements = {
     "IM8": ["Data encryption", "Access control", "Audit logging"],
     "AGC COC": ["Asset classification", "Third-party risk", "Business continuity"]
@@ -27,39 +29,40 @@ compliance_requirements = {
 st.title("🧠 AIP³ - AI Partner for Public Procurement (PoC)")
 st.subheader("Generate & Check Draft Procurement Clauses")
 
-# Step 1: Input prompt
+# Input area
 prompt = st.text_area("Enter your requirement prompt:", "Draft functional requirements for a CRM system.")
 
 if st.button("Generate Draft"):
-    # GPT Call
     try:
-        response = openai.ChatCompletion.create(
+        # Call OpenAI API
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You're a Singapore government procurement officer drafting IT specifications."},
                 {"role": "user", "content": prompt}
-            ],
-            temperature=0.5
+            ]
         )
-        draft = response['choices'][0]['message']['content']
+        draft = response.choices[0].message.content
         st.success("Generated Draft:")
         st.write(draft)
+
+        # Compliance Check
+        st.subheader("✅ Compliance Check")
+        for standard, checks in compliance_requirements.items():
+            st.markdown(f"**{standard} Requirements Check:**")
+            for item in checks:
+                if item.lower() in draft.lower():
+                    st.markdown(f"- ✅ `{item}` present")
+                else:
+                    st.markdown(f"- ❌ `{item}` missing")
+
+        # Reference Clauses
+        st.subheader("📚 Reference Clauses from Past Tenders")
+        for topic, examples in reference_data.items():
+            st.markdown(f"**{topic}:**")
+            for example in examples:
+                st.markdown(f"- 📄 _{example}_")
+
     except Exception as e:
-        st.error(f"Error: {str(e)}")
+        st.error(f"Error generating draft: {str(e)}")
 
-    # Step 2: Compliance Check (Mock)
-    st.subheader("✅ Compliance Check")
-    for standard, clauses in compliance_requirements.items():
-        st.markdown(f"**{standard} Requirements Check:**")
-        for clause in clauses:
-            if clause.lower() in draft.lower():
-                st.markdown(f"- ✅ `{clause}` present")
-            else:
-                st.markdown(f"- ❌ `{clause}` missing")
-
-    # Step 3: Reference Clauses
-    st.subheader("📚 Reference Clauses from Past Tenders")
-    for topic, refs in reference_data.items():
-        st.markdown(f"**{topic}:**")
-        for ref in refs:
-            st.markdown(f"- 📄 _{ref}_")
