@@ -16,9 +16,9 @@ st.sidebar.title("🧭 AIP³ Assistant")
 
 page = st.sidebar.radio("Choose function:", [
     "📘 Document Viewer",
-    "✅ Compliance Simulation",
     "🤖 Draft Generator",
-    "📝 Evaluation Assistant (Coming Soon)",
+    "✅ Compliance Simulation",
+    "📝 Evaluation Assistant",
     "🔄 Workflow (Coming Soon)"
 ])
 
@@ -61,7 +61,41 @@ if page == "📘 Document Viewer":
         else:
             st.warning("OpenAI client not initialized. Check API key.")
 
-# Page 2: Compliance Checker
+# Page 2: Draft Generator
+elif page == "🤖 Draft Generator":
+    st.title("🤖 AI-Powered Draft Generator")
+
+    use_case = st.selectbox("Select Use Case", ["CRM System", "Cloud Hosting", "Exit Management", "Integration Services"])
+    example_prompts = {
+        "CRM System": "Draft business requirements for a CRM system.",
+        "Cloud Hosting": "Draft specs for cloud-native application hosting on GCC.",
+        "Exit Management": "Write clauses for service transition and exit obligations.",
+        "Integration Services": "Draft specs for data and system integration services."
+    }
+
+    prompt = st.text_area("Prompt", value=example_prompts[use_case])
+    draft_output = ""
+
+    if st.button("Generate Draft"):
+        if client:
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are a government procurement officer drafting tender specifications."},
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                draft_output = response.choices[0].message.content
+                st.success("Generated Draft:")
+                edited = st.text_area("Edit Draft Below (Optional)", value=draft_output, height=300)
+                st.download_button("📥 Download Draft as TXT", edited, file_name="draft_spec.txt")
+            except Exception as e:
+                st.error(f"Error generating draft: {str(e)}")
+        else:
+            st.warning("OpenAI client not initialized. Check API key.")
+
+# Page 3: Compliance Checker
 elif page == "✅ Compliance Simulation":
     st.title("✅ Compliance Check Simulation")
 
@@ -99,42 +133,26 @@ elif page == "✅ Compliance Simulation":
     filtered_df = df[df["Status"].isin(clause_filter)]
     st.dataframe(filtered_df, use_container_width=True)
 
-# Page 3: AI Draft Generator
-elif page == "🤖 Draft Generator":
-    st.title("🤖 AI-Powered Draft Generator")
-
-    use_case = st.selectbox("Select Use Case", ["CRM System", "Cloud Hosting", "Exit Management", "Integration Services"])
-    example_prompts = {
-        "CRM System": "Draft business requirements for a CRM system.",
-        "Cloud Hosting": "Draft specs for cloud-native application hosting on GCC.",
-        "Exit Management": "Write clauses for service transition and exit obligations.",
-        "Integration Services": "Draft specs for data and system integration services."
-    }
-
-    prompt = st.text_area("Prompt", value=example_prompts[use_case])
-
-    if st.button("Generate Draft"):
-        if client:
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "You are a government procurement officer drafting tender specifications."},
-                        {"role": "user", "content": prompt}
-                    ]
-                )
-                draft = response.choices[0].message.content
-                st.success("Generated Draft:")
-                st.write(draft)
-            except Exception as e:
-                st.error(f"Error generating draft: {str(e)}")
-        else:
-            st.warning("OpenAI client not initialized. Check API key.")
-
-# Page 4: Evaluation Assistant (Coming Soon)
-elif page == "📝 Evaluation Assistant (Coming Soon)":
+# Page 4: Evaluation Assistant
+elif page == "📝 Evaluation Assistant":
     st.title("📝 Evaluation Assistant")
-    st.info("This section will guide officers on scorecard criteria, vendor scoring, and justification summaries.")
+
+    st.markdown("This section helps simulate how vendor proposals might be evaluated based on:")
+    st.markdown("- 💰 Cost structure")
+    st.markdown("- 👥 Team composition")
+    st.markdown("- 🧠 Solution quality")
+    st.markdown("---")
+
+    st.subheader("📊 Mock Vendor Evaluation Table")
+
+    eval_data = pd.DataFrame([
+        {"Vendor": "Alpha Tech", "Cost (SGD)": 180000, "Team Size": 6, "Score": 84, "Remarks": "Good price-to-value ratio"},
+        {"Vendor": "Beta Solutions", "Cost (SGD)": 240000, "Team Size": 8, "Score": 90, "Remarks": "Strong proposal, slightly costlier"},
+        {"Vendor": "GammaSoft", "Cost (SGD)": 200000, "Team Size": 5, "Score": 78, "Remarks": "Lean team, less scalable"}
+    ])
+    st.dataframe(eval_data, use_container_width=True)
+
+    st.info("In future releases, you can simulate your own proposal inputs and auto-score against past agency benchmarks.")
 
 # Page 5: Workflow Integration Placeholder
 elif page == "🔄 Workflow (Coming Soon)":
