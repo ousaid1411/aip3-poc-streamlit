@@ -95,7 +95,54 @@ elif page == "🤖 Draft Generator":
         else:
             st.warning("OpenAI client not initialized. Check API key.")
 
+
 # Page 3: Compliance Checker
+elif page == "✅ Compliance Simulation":
+    st.title("✅ Compliance Check Simulation")
+
+    st.markdown("This simulation reviews a tender draft for compliance gaps against IM8 or AGC COC.")
+    review_source = st.radio("Select Source:", ["Use generated draft", "Upload tender copy"])
+
+    if review_source == "Upload tender copy":
+        uploaded_file = st.file_uploader("Upload a tender document (PDF or text)", type=["pdf", "txt"])
+        if uploaded_file:
+            st.info(f"Uploaded file: {uploaded_file.name}")
+            st.success("✔️ Document parsed successfully (simulated). Proceeding to clause review...")
+
+    selected_tab = st.radio("Choose Standard:", ["IM8 Checks", "AGC COC Checks"])
+
+    if selected_tab == "IM8 Checks":
+        data = {
+            "Tender Section": ["4. Security", "8. System Availability", "3. Technical"],
+            "Clause": ["4.2", "8.1", "3.5"],
+            "Status": ["❌", "⚠️", "✅"],
+            "Remarks": [
+                "Missing data encryption clause (IM8 Section 4.1)",
+                "Availability target below IM8 minimum 99.5%",
+                "Aligns with IM8 cloud zoning (Govinfra–GCC)"
+            ]
+        }
+    else:
+        data = {
+            "Tender Section": ["5. Maintenance", "6. Testing", "4. Security"],
+            "Clause": ["5.3", "6.2", "4.5"],
+            "Status": ["⚠️", "✅", "❌"],
+            "Remarks": [
+                "Lacks clear maintenance SLA reference (COC Part 1.A Clause 3)",
+                "Includes acceptance test framework (COC Part 1.B Clause 2.1)",
+                "Does not mention asset protection tagging (COC Part 1.B Clause 7)"
+            ]
+        }
+
+    df = pd.DataFrame(data)
+
+    st.markdown("### Clause Legend")
+    st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
+
+    clause_filter = st.multiselect("Filter by Status", ["✅", "⚠️", "❌"], default=["✅", "⚠️", "❌"])
+    filtered_df = df[df["Status"].isin(clause_filter)]
+    st.dataframe(filtered_df, use_container_width=True)
+
 elif page == "✅ Compliance Simulation":
     st.title("✅ Compliance Check Simulation")
 
