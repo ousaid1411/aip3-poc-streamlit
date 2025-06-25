@@ -18,26 +18,48 @@ page = st.sidebar.radio("Choose function:", [
     "📘 Document Viewer",
     "✅ Compliance Simulation",
     "🤖 Draft Generator",
+    "📝 Evaluation Assistant (Coming Soon)",
     "🔄 Workflow (Coming Soon)"
 ])
 
-# Page 1: Document Viewer (Placeholder for Intelligent Search & Builder)
+# Page 1: Document Viewer
 if page == "📘 Document Viewer":
     st.title("📘 Business Requirements Viewer")
 
-    st.sidebar.header("📂 References")
-    st.sidebar.markdown("🔘 **Custom CRM Solution – Ministry of Finance**")
-    st.sidebar.markdown("🔵 **Procurement System – Agency for Digital Services**")
-    st.sidebar.markdown("🟡 **Client Management Portal – Municipal Council**")
+    st.subheader("Search Past Tenders")
+    agency = st.selectbox("Select Agency", ["MOF", "MOE", "MOM", "HDB", "GovTech"])
+    category = st.selectbox("Select Product Type", ["CRM", "Cloud Hosting", "Integration", "Exit Mgmt"])
 
-    st.markdown("""
-    This page showcases procurement business requirements across use cases:
+    st.markdown(f"🔍 Showing results for **{agency}** – *{category}*")
 
-    #### Example – Custom CRM System:
-    1. Centralizes client data in a unified platform  
-    2. Tracks and manages client interactions across channels  
-    3. Includes reporting and analytics for client engagement insights  
-    """)
+    mock_results = pd.DataFrame([
+        {"Tender Title": "CRM for Ground Ops", "Agency": "MOF", "Year": 2022, "Extract": "Client data unification required"},
+        {"Tender Title": "SaaS Exit Management", "Agency": "MOE", "Year": 2023, "Extract": "All assets must be tagged for exit"},
+        {"Tender Title": "Integrated Cloud Hosting", "Agency": "GovTech", "Year": 2024, "Extract": "Govinfra GCC hosting mandatory"}
+    ])
+
+    filtered = mock_results[(mock_results["Agency"] == agency) & (mock_results["Tender Title"].str.contains(category.split()[0], case=False))]
+    st.dataframe(filtered, use_container_width=True)
+
+    st.divider()
+
+    st.subheader("Tender Clause Extractor (Optional)")
+    clause_text = st.text_area("Paste tender clause for analysis (optional):")
+
+    if st.button("Extract Key Requirement"):
+        if client:
+            with st.spinner("Extracting..."):
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You're a government procurement analyst. Summarize and classify tender clauses."},
+                        {"role": "user", "content": clause_text}
+                    ]
+                )
+                st.success("Extracted Insight:")
+                st.write(response.choices[0].message.content)
+        else:
+            st.warning("OpenAI client not initialized. Check API key.")
 
 # Page 2: Compliance Checker
 elif page == "✅ Compliance Simulation":
@@ -109,7 +131,12 @@ elif page == "🤖 Draft Generator":
         else:
             st.warning("OpenAI client not initialized. Check API key.")
 
-# Page 4: Placeholder for Workflow
+# Page 4: Evaluation Assistant (Coming Soon)
+elif page == "📝 Evaluation Assistant (Coming Soon)":
+    st.title("📝 Evaluation Assistant")
+    st.info("This section will guide officers on scorecard criteria, vendor scoring, and justification summaries.")
+
+# Page 5: Workflow Integration Placeholder
 elif page == "🔄 Workflow (Coming Soon)":
     st.title("🔄 GeBIZ / SG Tech Stack Integration")
     st.info("This section will support one-click export to GeBIZ-ready formats and integrate workflow routing with SGTS and internal systems.")
