@@ -1,3 +1,7 @@
 openai>=1.0.0
 streamlit
 pandas
+langchain
+faiss-cpu
+PyMuPDF
+
