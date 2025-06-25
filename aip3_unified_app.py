@@ -1,6 +1,4 @@
 
-# Trigger rebuild
-
 import streamlit as st
 import pandas as pd
 import os
@@ -14,35 +12,35 @@ except:
     client = None
 
 st.set_page_config(page_title="AIP³ Unified App", layout="wide")
+st.sidebar.title("🧭 AIP³ Assistant")
 
-# Navigation
-page = st.sidebar.selectbox("Go to page:", [
-    "📄 Business Requirements Viewer",
-    "✅ Compliance Check Simulation",
-    "🤖 Draft Generator (AI)"
+page = st.sidebar.radio("Choose function:", [
+    "📘 Document Viewer",
+    "✅ Compliance Simulation",
+    "🤖 Draft Generator",
+    "🔄 Workflow (Coming Soon)"
 ])
 
-# Business Requirements Page
-if page == "📄 Business Requirements Viewer":
-    st.title("📄 Part 2, Chapter 3 - Business Requirements: CRM System")
+# Page 1: Document Viewer (Placeholder for Intelligent Search & Builder)
+if page == "📘 Document Viewer":
+    st.title("📘 Business Requirements Viewer")
 
-    st.sidebar.header("References")
+    st.sidebar.header("📂 References")
     st.sidebar.markdown("🔘 **Custom CRM Solution – Ministry of Finance**")
     st.sidebar.markdown("🔵 **Procurement System – Agency for Digital Services**")
     st.sidebar.markdown("🟡 **Client Management Portal – Municipal Council**")
 
     st.markdown("""
-    To a custom-developed Customer Relationship Management (CRM) system will manage interactions,
-    relationships, and data related to the organization’s clients.
+    This page showcases procurement business requirements across use cases:
 
-    ### Customizing custom-developed CRM system:
-    1. The CRM system must centralize client data in a single, unified platform.  
-    2. The system should be capable of tracking and managing client interactions across various channels.  
-    3. A comprehensive reporting and analytics tool must be included to provide insights into client-related activities.
+    #### Example – Custom CRM System:
+    1. Centralizes client data in a unified platform  
+    2. Tracks and manages client interactions across channels  
+    3. Includes reporting and analytics for client engagement insights  
     """)
 
-# Compliance Check Page
-elif page == "✅ Compliance Check Simulation":
+# Page 2: Compliance Checker
+elif page == "✅ Compliance Simulation":
     st.title("✅ Compliance Check Simulation")
 
     selected_tab = st.radio("Choose Standard:", ["IM8 Checks", "AGC COC Checks"])
@@ -71,13 +69,27 @@ elif page == "✅ Compliance Check Simulation":
         }
 
     df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True)
 
-# Draft Generator Page
-elif page == "🤖 Draft Generator (AI)":
+    st.markdown("### Clause Legend")
+    st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
+
+    clause_filter = st.multiselect("Filter by Status", ["✅", "⚠️", "❌"], default=["✅", "⚠️", "❌"])
+    filtered_df = df[df["Status"].isin(clause_filter)]
+    st.dataframe(filtered_df, use_container_width=True)
+
+# Page 3: AI Draft Generator
+elif page == "🤖 Draft Generator":
     st.title("🤖 AI-Powered Draft Generator")
 
-    prompt = st.text_area("Enter your procurement requirement prompt:", "Draft business requirements for a CRM system.")
+    use_case = st.selectbox("Select Use Case", ["CRM System", "Cloud Hosting", "Exit Management", "Integration Services"])
+    example_prompts = {
+        "CRM System": "Draft business requirements for a CRM system.",
+        "Cloud Hosting": "Draft specs for cloud-native application hosting on GCC.",
+        "Exit Management": "Write clauses for service transition and exit obligations.",
+        "Integration Services": "Draft specs for data and system integration services."
+    }
+
+    prompt = st.text_area("Prompt", value=example_prompts[use_case])
 
     if st.button("Generate Draft"):
         if client:
@@ -97,3 +109,7 @@ elif page == "🤖 Draft Generator (AI)":
         else:
             st.warning("OpenAI client not initialized. Check API key.")
 
+# Page 4: Placeholder for Workflow
+elif page == "🔄 Workflow (Coming Soon)":
+    st.title("🔄 GeBIZ / SG Tech Stack Integration")
+    st.info("This section will support one-click export to GeBIZ-ready formats and integrate workflow routing with SGTS and internal systems.")
