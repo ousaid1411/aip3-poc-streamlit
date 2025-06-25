@@ -12,9 +12,10 @@ except:
     client = None
 
 st.set_page_config(page_title="AIP³ Unified App", layout="wide")
-st.sidebar.title("🧭 AIP³ Assistant")
+st.title("🤖 AIP³ — AI Partner for Public Procurement")
+st.markdown("##### Navigate the key functions below:")
 
-page = st.sidebar.radio("Choose function:", [
+tabs = st.tabs([
     "📘 Document Viewer",
     "🤖 Draft Generator",
     "✅ Compliance Simulation",
@@ -23,8 +24,8 @@ page = st.sidebar.radio("Choose function:", [
 ])
 
 # Page 1: Document Viewer
-if page == "📘 Document Viewer":
-    st.title("📘 Business Requirements Viewer")
+with tabs[0]:
+    st.subheader("📘 Business Requirements Viewer")
 
     st.subheader("Search Past Tenders")
     agency = st.selectbox("Select Agency", ["MOF", "MOE", "MOM", "HDB", "GovTech"])
@@ -62,8 +63,8 @@ if page == "📘 Document Viewer":
             st.warning("OpenAI client not initialized. Check API key.")
 
 # Page 2: Draft Generator
-elif page == "🤖 Draft Generator":
-    st.title("🤖 AI-Powered Draft Generator")
+with tabs[1]:
+    st.subheader("🤖 AI-Powered Draft Generator")
 
     use_case = st.selectbox("Select Use Case", ["CRM System", "Cloud Hosting", "Exit Management", "Integration Services"])
     example_prompts = {
@@ -95,10 +96,9 @@ elif page == "🤖 Draft Generator":
         else:
             st.warning("OpenAI client not initialized. Check API key.")
 
-
 # Page 3: Compliance Checker
-elif page == "✅ Compliance Simulation":
-    st.title("✅ Compliance Check Simulation")
+with tabs[2]:
+    st.subheader("✅ Compliance Check Simulation")
 
     st.markdown("This simulation reviews a tender draft for compliance gaps against IM8 or AGC COC.")
     review_source = st.radio("Select Source:", ["Use generated draft", "Upload tender copy"])
@@ -143,46 +143,9 @@ elif page == "✅ Compliance Simulation":
     filtered_df = df[df["Status"].isin(clause_filter)]
     st.dataframe(filtered_df, use_container_width=True)
 
-elif page == "✅ Compliance Simulation":
-    st.title("✅ Compliance Check Simulation")
-
-    selected_tab = st.radio("Choose Standard:", ["IM8 Checks", "AGC COC Checks"])
-
-    if selected_tab == "IM8 Checks":
-        data = {
-            "Tender Section": ["4. Security", "8. System Availability", "3. Technical"],
-            "Clause": ["4.2", "8.1", "3.5"],
-            "Status": ["❌", "⚠️", "✅"],
-            "Remarks": [
-                "Missing data encryption clause (IM8 Section 4.1)",
-                "Availability target below IM8 minimum 99.5%",
-                "Aligns with IM8 cloud zoning (Govinfra–GCC)"
-            ]
-        }
-    else:
-        data = {
-            "Tender Section": ["5. Maintenance", "6. Testing", "4. Security"],
-            "Clause": ["5.3", "6.2", "4.5"],
-            "Status": ["⚠️", "✅", "❌"],
-            "Remarks": [
-                "Lacks clear maintenance SLA reference (COC Part 1.A Clause 3)",
-                "Includes acceptance test framework (COC Part 1.B Clause 2.1)",
-                "Does not mention asset protection tagging (COC Part 1.B Clause 7)"
-            ]
-        }
-
-    df = pd.DataFrame(data)
-
-    st.markdown("### Clause Legend")
-    st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
-
-    clause_filter = st.multiselect("Filter by Status", ["✅", "⚠️", "❌"], default=["✅", "⚠️", "❌"])
-    filtered_df = df[df["Status"].isin(clause_filter)]
-    st.dataframe(filtered_df, use_container_width=True)
-
 # Page 4: Evaluation Assistant
-elif page == "📝 Evaluation Assistant":
-    st.title("📝 Evaluation Assistant")
+with tabs[3]:
+    st.subheader("📝 Evaluation Assistant")
 
     st.markdown("This section helps simulate how vendor proposals might be evaluated based on:")
     st.markdown("- 💰 Cost structure")
@@ -199,9 +162,7 @@ elif page == "📝 Evaluation Assistant":
     ])
     st.dataframe(eval_data, use_container_width=True)
 
-    st.info("In future releases, you can simulate your own proposal inputs and auto-score against past agency benchmarks.")
-
-# Page 5: Workflow Integration Placeholder
-elif page == "🔄 Workflow (Coming Soon)":
-    st.title("🔄 GeBIZ / SG Tech Stack Integration")
+# Page 5: Workflow Integration
+with tabs[4]:
+    st.subheader("🔄 Workflow (Coming Soon)")
     st.info("This section will support one-click export to GeBIZ-ready formats and integrate workflow routing with SGTS and internal systems.")
