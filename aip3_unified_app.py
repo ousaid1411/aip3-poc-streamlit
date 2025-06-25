@@ -133,3 +133,4 @@ elif page == "🔍 Procurement Doc Q&A (RAG)":
                     st.success("🧠 Answer:")
                     st.markdown(result)
 
+# Trigger rebuild
