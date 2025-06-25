@@ -1,6 +1,6 @@
 openai>=1.0.0
 streamlit
 pandas
-langchain
-faiss-cpu
-PyMuPDF
+langchain==0.1.13
+faiss-cpu==1.7.4
+PyMuPDF==1.22.0
