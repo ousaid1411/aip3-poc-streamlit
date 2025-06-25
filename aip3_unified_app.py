@@ -19,8 +19,7 @@ st.set_page_config(page_title="AIP³ Unified App", layout="wide")
 page = st.sidebar.selectbox("Go to page:", [
     "📄 Business Requirements Viewer",
     "✅ Compliance Check Simulation",
-    "🤖 Draft Generator (AI)",
-    "🔍 Procurement Doc Q&A (RAG)"
+    "🤖 Draft Generator (AI)"
 ])
 
 # Business Requirements Page
@@ -98,39 +97,3 @@ elif page == "🤖 Draft Generator (AI)":
         else:
             st.warning("OpenAI client not initialized. Check API key.")
 
-elif page == "🔍 Procurement Doc Q&A (RAG)":
-    st.title("🔍 Procurement Document Q&A (RAG)")
-
-    try:
-        from langchain.chat_models import ChatOpenAI
-        from langchain.embeddings import OpenAIEmbeddings
-        from langchain.vectorstores import FAISS
-        from langchain.document_loaders import PyPDFLoader
-        from langchain.chains import RetrievalQA
-    except ImportError:
-        st.error("Missing dependencies. Run `pip install langchain openai faiss-cpu PyMuPDF`.")
-    else:
-        uploaded_file = st.file_uploader("📎 Upload a procurement PDF", type="pdf")
-
-        if uploaded_file:
-            with open("temp_uploaded_doc.pdf", "wb") as f:
-                f.write(uploaded_file.read())
-
-            with st.spinner("Processing document..."):
-                loader = PyPDFLoader("temp_uploaded_doc.pdf")
-                docs = loader.load_and_split()
-
-                embeddings = OpenAIEmbeddings()
-                db = FAISS.from_documents(docs, embeddings)
-                retriever = db.as_retriever()
-
-                llm = ChatOpenAI(model="gpt-4", temperature=0.2)
-                qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
-
-            query = st.text_input("💬 Ask your question about the document")
-
-            if query:
-                with st.spinner("Searching..."):
-                    result = qa_chain.run(query)
-                    st.success("🧠 Answer:")
-                    st.markdown(result)
