@@ -1,4 +1,6 @@
 
+# Trigger rebuild
+
 import streamlit as st
 import pandas as pd
 import os
@@ -132,5 +134,3 @@ elif page == "🔍 Procurement Doc Q&A (RAG)":
                     result = qa_chain.run(query)
                     st.success("🧠 Answer:")
                     st.markdown(result)
-
-# Trigger rebuild
