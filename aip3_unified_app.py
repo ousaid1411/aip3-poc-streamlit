@@ -57,47 +57,7 @@ with tabs[0]:
     else:
         st.info("Enter a topic above to begin searching.")
 
-    st.markdown("Search across past tender specifications and evaluation criteria using topic prompts and optional vendor keywords.")
-
-    topic = st.text_input("Enter topic or specification keyword (e.g., CRM, exit mgmt, integration):", "")
-    vendor = st.text_input("Optional: Enter vendor keyword (e.g., IBM, ServiceNow):", "")
-
-    sample_tenders = pd.DataFrame([
-        {"Agency": "MOF", "Title": "CRM for Licensing Ops", "Spec Match": "CRM, citizen interaction", "Vendors": "Salesforce"},
-        {"Agency": "MOM", "Title": "Integration Platform", "Spec Match": "Integration, event bus", "Vendors": "IBM"},
-        {"Agency": "MOE", "Title": "Exit Management for SaaS", "Spec Match": "exit, offboarding", "Vendors": "NA"},
-        {"Agency": "GovTech", "Title": "Cloud Hosting Services", "Spec Match": "GCC, cloud-native", "Vendors": "AWS"}
-    ])
-
-    results = sample_tenders[
-        sample_tenders["Spec Match"].str.contains(topic, case=False, na=False)
-        & sample_tenders["Vendors"].str.contains(vendor, case=False, na=False)
-        if vendor else
-        sample_tenders["Spec Match"].str.contains(topic, case=False, na=False)
-    ]
-
-    if topic:
-        st.success(f"Found {len(results)} matching tenders.")
-        st.dataframe(results, use_container_width=True)
-
-        if client:
-            st.markdown("### ✨ Suggested Clauses or Specs (AI Generated)")
-            prompt_text = f"Suggest procurement specification clauses for {topic} tenders"
-            if vendor:
-                prompt_text += f" involving {vendor}"
-
-            with st.spinner("Generating suggestions..."):
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "You are a procurement assistant. Suggest standard clauses based on the topic."},
-                        {"role": "user", "content": prompt_text}
-                    ]
-                )
-                st.write(response.choices[0].message.content)
-    else:
-        st.info("Enter a topic above to begin searching.")
-
+   
 # Page 2: Draft Generator
 with tabs[1]:
     st.subheader("🤖 AI-Powered Draft Generator")
