@@ -12,8 +12,8 @@ except:
     client = None
 
 st.set_page_config(page_title="AIP³ Unified App", layout="wide")
-st.title("🤖 AIP³ — AI Partner for Public Procurement")
-st.markdown("##### Navigate the key functions below:")
+st.markdown("<h1 style='text-align: center;'>🤖 AIP³ — AI Partner for Public Procurement</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Search, draft, evaluate, and simulate — all in one place</p>", unsafe_allow_html=True)
 
 tabs = st.tabs([
     "📘 Document Viewer",
@@ -23,23 +23,49 @@ tabs = st.tabs([
     "🔄 Workflow (Coming Soon)"
 ])
 
-# Page 1: Document Viewer
+# Page 1: Document Viewer — Research & Reference Flow
 with tabs[0]:
-    st.subheader("📘 Business Requirements Viewer")
+    st.subheader("🔎 Research & Reference")
 
-    st.subheader("Search Past Tenders")
+    st.markdown("""
+    Quickly find reference tenders and extract key requirements and evaluation criteria across agencies.
+    """)
+
     agency = st.selectbox("Select Agency", ["MOF", "MOE", "MOM", "HDB", "GovTech"])
     category = st.selectbox("Select Product Type", ["CRM", "Cloud Hosting", "Integration", "Exit Mgmt"])
 
-    st.markdown(f"🔍 Showing results for **{agency}** – *{category}*")
+    st.markdown(f"📁 Showing past tenders for **{agency}** – *{category}*")
 
+    # Enhanced mock data with Evaluation Criteria
     mock_results = pd.DataFrame([
-        {"Tender Title": "CRM for Ground Ops", "Agency": "MOF", "Year": 2022, "Extract": "Client data unification required"},
-        {"Tender Title": "SaaS Exit Management", "Agency": "MOE", "Year": 2023, "Extract": "All assets must be tagged for exit"},
-        {"Tender Title": "Integrated Cloud Hosting", "Agency": "GovTech", "Year": 2024, "Extract": "Govinfra GCC hosting mandatory"}
+        {
+            "Tender Title": "CRM for Ground Ops",
+            "Agency": "MOF",
+            "Year": 2022,
+            "Extract": "Unify citizen records and case workflows",
+            "Evaluation Criteria": "Cost 40%, UX 30%, Scalability 30%"
+        },
+        {
+            "Tender Title": "SaaS Exit Management",
+            "Agency": "MOE",
+            "Year": 2023,
+            "Extract": "Tagged assets and vendor rollback provisions",
+            "Evaluation Criteria": "Exit Plan 50%, Cost 30%, Risk Mgmt 20%"
+        },
+        {
+            "Tender Title": "Integrated Cloud Hosting",
+            "Agency": "GovTech",
+            "Year": 2024,
+            "Extract": "GovInfra GCC compliance required",
+            "Evaluation Criteria": "Availability 35%, Security 40%, Price 25%"
+        }
     ])
 
-    filtered = mock_results[(mock_results["Agency"] == agency) & (mock_results["Tender Title"].str.contains(category.split()[0], case=False))]
+    filtered = mock_results[
+        (mock_results["Agency"] == agency) &
+        (mock_results["Tender Title"].str.contains(category.split()[0], case=False))
+    ]
+
     st.dataframe(filtered, use_container_width=True)
 
     st.divider()
@@ -135,9 +161,10 @@ with tabs[2]:
         }
 
     df = pd.DataFrame(data)
-
     st.markdown("### Clause Legend")
-    st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
+    st.markdown("- ✅ Compliant
+- ⚠️ Partial
+- ❌ Non-compliant")
 
     clause_filter = st.multiselect("Filter by Status", ["✅", "⚠️", "❌"], default=["✅", "⚠️", "❌"])
     filtered_df = df[df["Status"].isin(clause_filter)]
