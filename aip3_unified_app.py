@@ -111,7 +111,7 @@ with tabs[1]:
     }
 
     default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
-prompt = st.text_area("Prompt", value=default_prompt)
+    prompt = st.text_area("Prompt", value=default_prompt)
     draft_output = ""
 
     if st.button("Generate Draft"):
