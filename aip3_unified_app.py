@@ -97,12 +97,12 @@ with tabs[1]:
         
             except Exception as e:
             st.error(f"Error generating draft: {str(e)}")
-    else:
+       else:
         st.warning("OpenAI client not initialized. Check API key.")
         st.download_button("📥 Download Draft as TXT", edited, file_name="draft_spec.txt")
             except Exception as e:
                 st.error(f"Error generating draft: {str(e)}")
-        else:
+    else:
             st.warning("OpenAI client not initialized. Check API key.")
 
 # Page 3: Compliance Checker
