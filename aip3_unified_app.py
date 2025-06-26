@@ -151,21 +151,31 @@ with tabs[2]:
 # Page 4: Evaluation Assistant
 with tabs[3]:
     st.subheader("📝 Evaluation Assistant")
+    st.markdown("Upload vendor proposals and define evaluation criteria to simulate scoring and shortlisting.")
 
-    st.markdown("This section helps simulate how vendor proposals might be evaluated based on:")
-    st.markdown("- 💰 Cost structure")
-    st.markdown("- 👥 Team composition")
-    st.markdown("- 🧠 Solution quality")
-    st.markdown("---")
+    # Upload proposals
+    proposal_files = st.file_uploader("📤 Upload Vendor Proposals (PDF or TXT)", type=["pdf", "txt"], accept_multiple_files=True)
 
-    st.subheader("📊 Mock Vendor Evaluation Table")
+    # Define criteria
+    st.markdown("### 🧮 Define Evaluation Criteria")
+    criteria = st.text_area("Enter criteria (comma-separated)", value="Cost, Team Size, Solution Quality")
 
-    eval_data = pd.DataFrame([
-        {"Vendor": "Alpha Tech", "Cost (SGD)": 180000, "Team Size": 6, "Score": 84, "Remarks": "Good price-to-value ratio"},
-        {"Vendor": "Beta Solutions", "Cost (SGD)": 240000, "Team Size": 8, "Score": 90, "Remarks": "Strong proposal, slightly costlier"},
-        {"Vendor": "GammaSoft", "Cost (SGD)": 200000, "Team Size": 5, "Score": 78, "Remarks": "Lean team, less scalable"}
-    ])
-    st.dataframe(eval_data, use_container_width=True)
+    # Simulated processing
+    if st.button("Evaluate Proposals"):
+        if not proposal_files or not criteria:
+            st.warning("Please upload at least one proposal and enter evaluation criteria.")
+        else:
+            st.success(f"✅ {len(proposal_files)} proposals received")
+            parsed_criteria = [c.strip() for c in criteria.split(",")]
+
+            # Simulated output (mocked scores)
+            st.markdown("### 📊 Evaluation Results (Simulated)")
+            eval_data = pd.DataFrame([
+                {"Vendor": f"Vendor {i+1}", **{crit: f"{round(70 + 10*i + j*2)}" for j, crit in enumerate(parsed_criteria)}}
+                for i in range(len(proposal_files))
+            ])
+            st.dataframe(eval_data, use_container_width=True)
+            st.info("Scores are randomly simulated for demo purposes.")
 
 # Page 5: Workflow Integration
 with tabs[4]:
