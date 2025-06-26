@@ -23,9 +23,40 @@ tabs = st.tabs([
     "🔄 Workflow (Coming Soon)"
 ])
 
+
 # Page 1: Research & Reference Viewer
+@st.cache_data
+def load_mock_data():
+    return pd.read_csv("mock_tender_data.csv")
+
+mock_tenders = load_mock_data()
+
+
 with tabs[0]:
     st.subheader("🔎 Research & Reference (Past Tender Search)")
+    st.markdown("Search across past tender specifications and evaluation criteria using topic prompts and optional vendor keywords.")
+
+    topic = st.text_input("Enter topic or keyword (e.g. CRM, Cloud, ServiceNow):", "")
+    vendor = st.text_input("Optional: Enter vendor name (e.g. IBM, Salesforce):", "")
+
+    if topic:
+        filtered = mock_tenders[
+            mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
+            & mock_tenders["Keywords"].str.contains(vendor, case=False, na=False)
+            if vendor else
+            mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
+        ]
+
+        st.success(f"Found {len(filtered)} matching tenders.")
+        st.dataframe(filtered[["Agency", "Title", "Year", "Extract"]], use_container_width=True)
+
+        for i, row in filtered.iterrows():
+            st.markdown(f"**🔹 Recommended Spec Prompt:** {row['Recommended Spec Prompt']}")
+            if st.button(f"Use for Draft Generator ({row['Title']})", key=f"btn_{i}"):
+                st.session_state["selected_prompt"] = row["Recommended Spec Prompt"]
+    else:
+        st.info("Enter a topic above to begin searching.")
+
     st.markdown("Search across past tender specifications and evaluation criteria using topic prompts and optional vendor keywords.")
 
     topic = st.text_input("Enter topic or specification keyword (e.g., CRM, exit mgmt, integration):", "")
@@ -79,7 +110,8 @@ with tabs[1]:
         "Integration Services": "Draft specs for data and system integration services."
     }
 
-    prompt = st.text_area("Prompt", value=example_prompts[use_case])
+    default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
+prompt = st.text_area("Prompt", value=default_prompt)
     draft_output = ""
 
     if st.button("Generate Draft"):
