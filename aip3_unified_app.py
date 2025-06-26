@@ -174,9 +174,7 @@ with tabs[2]:
     df = pd.DataFrame(data)
 
     st.markdown("### Clause Legend")
-    st.markdown("- ✅ Compliant
-- ⚠️ Partial
-- ❌ Non-compliant")
+    st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
 
     clause_filter = st.multiselect("Filter by Status", ["✅", "⚠️", "❌"], default=["✅", "⚠️", "❌"])
     filtered_df = df[df["Status"].isin(clause_filter)]
