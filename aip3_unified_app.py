@@ -94,7 +94,8 @@ with tabs[1]:
             st.success("Generated Draft:")
             st.text_area("Generated Draft (Editable)", value=draft_output, key="edited_draft", height=300)
             st.download_button("📥 Download Draft as TXT", draft_output, file_name="draft_spec.txt")
-        except Exception as e:
+        
+            except Exception as e:
             st.error(f"Error generating draft: {str(e)}")
     else:
         st.warning("OpenAI client not initialized. Check API key.")
