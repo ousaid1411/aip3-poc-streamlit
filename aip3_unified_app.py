@@ -79,14 +79,16 @@ with tabs[1]:
     }
 
     default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
-    prompt = st.text_area("Prompt", value=default_prompt)if "selected_prompt" not in st.session_state:
+    prompt = st.text_area("Prompt", value=default_prompt)
+    
+    if "selected_prompt" not in st.session_state:
     st.session_state.selected_prompt = example_prompts["CRM System"]
 
-# Use selected prompt if exists, else fallback to example for selected use case
-selected_use_case_prompt = example_prompts.get(use_case, "")
-default_prompt = st.session_state.get("selected_prompt", selected_use_case_prompt)
-
-prompt = st.text_area("Prompt", value=default_prompt, key="draft_prompt")
+    # Use selected prompt if exists, else fallback to example for selected use case
+    selected_use_case_prompt = example_prompts.get(use_case, "")
+    default_prompt = st.session_state.get("selected_prompt", selected_use_case_prompt)
+    
+    prompt = st.text_area("Prompt", value=default_prompt, key="draft_prompt")
 
     draft_output = ""
 
