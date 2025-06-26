@@ -111,7 +111,7 @@ with tabs[1]:
     }
 
     default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
-    prompt = st.text_area("Prompt", value=default_prompt)
+prompt = st.text_area("Prompt", value=default_prompt)
     draft_output = ""
 
     if st.button("Generate Draft"):
@@ -174,7 +174,9 @@ with tabs[2]:
     df = pd.DataFrame(data)
 
     st.markdown("### Clause Legend")
-    st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
+    st.markdown("- ✅ Compliant
+- ⚠️ Partial
+- ❌ Non-compliant")
 
     clause_filter = st.multiselect("Filter by Status", ["✅", "⚠️", "❌"], default=["✅", "⚠️", "❌"])
     filtered_df = df[df["Status"].isin(clause_filter)]
