@@ -73,6 +73,10 @@ with tabs[1]:
         "Integration Services": "Draft specs for data and system integration services."
     }
 
+    # Use selected prompt from session_state if available, else fallback to example
+    if "selected_prompt" not in st.session_state:
+        st.session_state.selected_prompt = example_prompts[use_case]
+
     default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
     prompt = st.text_area("Prompt", value=default_prompt, key="draft_prompt", height=200)
 
