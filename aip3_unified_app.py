@@ -40,22 +40,30 @@ with tabs[0]:
     vendor = st.text_input("Optional: Enter vendor name (e.g. IBM, Salesforce):", "")
 
     if topic:
-        filtered = mock_tenders[
-            mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
-            & mock_tenders["Keywords"].str.contains(vendor, case=False, na=False)
-            if vendor else
-            mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
-        ]
+        # Filter results
+        if vendor:
+            filtered = mock_tenders[
+                mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
+                & mock_tenders["Keywords"].str.contains(vendor, case=False, na=False)
+            ]
+        else:
+            filtered = mock_tenders[
+                mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
+            ]
 
         st.success(f"Found {len(filtered)} matching tenders.")
         st.dataframe(filtered[["Agency", "Title", "Year", "Extract"]], use_container_width=True)
 
         for i, row in filtered.iterrows():
-            st.markdown(f"**🔹 Recommended Spec Prompt:** {row['Recommended Spec Prompt']}")
-            if st.button(f"Use for Draft Generator ({row['Title']})", key=f"btn_{i}"):
+            st.markdown(f"**🔹 Tender:** {row['Title']} ({row['Agency']}, {row['Year']})")
+            st.markdown(f"> _{row['Extract']}_")
+            st.markdown(f"**✨ Suggested Prompt:** `{row['Recommended Spec Prompt']}`")
+            
+            if st.button(f"Use this Prompt for Draft Generator", key=f"use_prompt_{i}"):
                 st.session_state["selected_prompt"] = row["Recommended Spec Prompt"]
+                st.success("✅ Loaded into Draft Generator tab.")
     else:
-        st.info("Enter a topic above to begin searching.")
+        st.info("Enter a topic to begin searching.")
 
    
 # Page 2: Draft Generator
