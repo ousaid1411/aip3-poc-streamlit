@@ -79,18 +79,7 @@ with tabs[1]:
     }
 
     default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
-    prompt = st.text_area("Prompt", value=default_prompt)
-    
-    if "selected_prompt" not in st.session_state:
-        st.session_state.selected_prompt = example_prompts["CRM System"]
-
-    # Use selected prompt if exists, else fallback to example for selected use case
-    selected_use_case_prompt = example_prompts.get(use_case, "")
-    default_prompt = st.session_state.get("selected_prompt", selected_use_case_prompt)
-    
-    prompt = st.text_area("Prompt", value=default_prompt, key="draft_prompt")
-    draft_output = ""
-
+    prompt = st.text_area("Prompt", value=default_prompt, key="draft_prompt", height=200)
     if st.button("Generate Draft"):
         if client:
             try:
@@ -101,10 +90,15 @@ with tabs[1]:
                         {"role": "user", "content": prompt}
                     ]
                 )
-                draft_output = response.choices[0].message.content
-                st.success("Generated Draft:")
-                edited = st.text_area("Edit Draft Below (Optional)", value=draft_output, height=300)
-                st.download_button("📥 Download Draft as TXT", edited, file_name="draft_spec.txt")
+            draft_output = response.choices[0].message.content
+            st.success("Generated Draft:")
+            st.text_area("Generated Draft (Editable)", value=draft_output, key="edited_draft", height=300)
+            st.download_button("📥 Download Draft as TXT", draft_output, file_name="draft_spec.txt")
+        except Exception as e:
+            st.error(f"Error generating draft: {str(e)}")
+    else:
+        st.warning("OpenAI client not initialized. Check API key.")
+        st.download_button("📥 Download Draft as TXT", edited, file_name="draft_spec.txt")
             except Exception as e:
                 st.error(f"Error generating draft: {str(e)}")
         else:
