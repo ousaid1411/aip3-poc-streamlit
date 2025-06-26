@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import os
@@ -23,14 +22,12 @@ tabs = st.tabs([
     "🔄 Workflow (Coming Soon)"
 ])
 
-
 # Page 1: Research & Reference Viewer
 @st.cache_data
 def load_mock_data():
     return pd.read_csv("mock_tender_data.csv")
 
 mock_tenders = load_mock_data()
-
 
 with tabs[0]:
     st.subheader("🔎 Research & Reference (Past Tender Search)")
@@ -40,7 +37,6 @@ with tabs[0]:
     vendor = st.text_input("Optional: Enter vendor name (e.g. IBM, Salesforce):", "")
 
     if topic:
-        # Filter results
         if vendor:
             filtered = mock_tenders[
                 mock_tenders["Keywords"].str.contains(topic, case=False, na=False)
@@ -58,14 +54,13 @@ with tabs[0]:
             st.markdown(f"**🔹 Tender:** {row['Title']} ({row['Agency']}, {row['Year']})")
             st.markdown(f"> _{row['Extract']}_")
             st.markdown(f"**✨ Suggested Prompt:** `{row['Recommended Spec Prompt']}`")
-            
+
             if st.button(f"Use this Prompt for Draft Generator", key=f"use_prompt_{i}"):
                 st.session_state["selected_prompt"] = row["Recommended Spec Prompt"]
                 st.success("✅ Loaded into Draft Generator tab.")
     else:
         st.info("Enter a topic to begin searching.")
 
-   
 # Page 2: Draft Generator
 with tabs[1]:
     st.subheader("🤖 AI-Powered Draft Generator")
@@ -80,6 +75,7 @@ with tabs[1]:
 
     default_prompt = st.session_state.get("selected_prompt", example_prompts[use_case])
     prompt = st.text_area("Prompt", value=default_prompt, key="draft_prompt", height=200)
+
     if st.button("Generate Draft"):
         if client:
             try:
@@ -90,19 +86,13 @@ with tabs[1]:
                         {"role": "user", "content": prompt}
                     ]
                 )
-            draft_output = response.choices[0].message.content
-            st.success("Generated Draft:")
-            st.text_area("Generated Draft (Editable)", value=draft_output, key="edited_draft", height=300)
-            st.download_button("📥 Download Draft as TXT", draft_output, file_name="draft_spec.txt")
-        
-            except Exception as e:
-            st.error(f"Error generating draft: {str(e)}")
-       else:
-        st.warning("OpenAI client not initialized. Check API key.")
-        st.download_button("📥 Download Draft as TXT", edited, file_name="draft_spec.txt")
+                draft_output = response.choices[0].message.content
+                st.success("Generated Draft:")
+                st.text_area("Generated Draft (Editable)", value=draft_output, key="edited_draft", height=300)
+                st.download_button("📥 Download Draft as TXT", draft_output, file_name="draft_spec.txt")
             except Exception as e:
                 st.error(f"Error generating draft: {str(e)}")
-    else:
+        else:
             st.warning("OpenAI client not initialized. Check API key.")
 
 # Page 3: Compliance Checker
@@ -144,7 +134,6 @@ with tabs[2]:
         }
 
     df = pd.DataFrame(data)
-
     st.markdown("### Clause Legend")
     st.markdown("- ✅ Compliant\n- ⚠️ Partial\n- ❌ Non-compliant")
 
@@ -157,22 +146,16 @@ with tabs[3]:
     st.subheader("📝 Evaluation Assistant")
     st.markdown("Upload vendor proposals and define evaluation criteria to simulate scoring and shortlisting.")
 
-    # Upload proposals
     proposal_files = st.file_uploader("📤 Upload Vendor Proposals (PDF or TXT)", type=["pdf", "txt"], accept_multiple_files=True)
-
-    # Define criteria
     st.markdown("### 🧮 Define Evaluation Criteria")
     criteria = st.text_area("Enter criteria (comma-separated)", value="Cost, Team Size, Solution Quality")
 
-    # Simulated processing
     if st.button("Evaluate Proposals"):
         if not proposal_files or not criteria:
             st.warning("Please upload at least one proposal and enter evaluation criteria.")
         else:
             st.success(f"✅ {len(proposal_files)} proposals received")
             parsed_criteria = [c.strip() for c in criteria.split(",")]
-
-            # Simulated output (mocked scores)
             st.markdown("### 📊 Evaluation Results (Simulated)")
             eval_data = pd.DataFrame([
                 {"Vendor": f"Vendor {i+1}", **{crit: f"{round(70 + 10*i + j*2)}" for j, crit in enumerate(parsed_criteria)}}
